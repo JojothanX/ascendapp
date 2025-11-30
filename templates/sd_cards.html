@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}SD cards{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <h1 class="h4 mb-3">SD cards</h1>
+  </div>
+
+  {% if current_user.role == "founder" %}
+  <div class="col-12 col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Add SD card</h5>
+        <form method="post">
+          <input type="hidden" name="action" value="add_card">
+          <div class="mb-2">
+            <label class="form-label">Label</label>
+            <input type="text" class="form-control" name="label" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Capacity (GB)</label>
+            <input type="number" class="form-control" name="capacity_gb">
+          </div>
+          <button class="btn btn-primary btn-sm">Add</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="col-12 col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Check out card</h5>
+        <form method="post">
+          <input type="hidden" name="action" value="checkout">
+          <div class="mb-2">
+            <label class="form-label">SD card</label>
+            <select class="form-select" name="sd_card_id" required>
+              <option value="">Select</option>
+              {% for c in sd_cards if c.status == "available" %}
+                <option value="{{ c.id }}">{{ c.label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Event (optional)</label>
+            <select class="form-select" name="event_id">
+              <option value="">None</option>
+              {% for e in events %}
+                <option value="{{ e.id }}">{{ e.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Session (optional)</label>
+            <select class="form-select" name="session_id">
+              <option value="">None</option>
+              {% for s in sessions %}
+                <option value="{{ s.id }}">{{ s.label }} ({{ s.date }})</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Purpose</label>
+            <input type="text" class="form-control" name="purpose" placeholder="Platform 1 photos, BTS etc">
+          </div>
+          <button class="btn btn-primary btn-sm">Check out</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-3">
+  <div class="card-body">
+    <h5 class="card-title">Cards currently checked out</h5>
+    {% if open_logs %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead>
+            <tr>
+              <th>Card</th>
+              <th>User</th>
+              <th>Event / Session</th>
+              <th>Purpose</th>
+              <th>Checked out at</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for log in open_logs %}
+              <tr>
+                <td>{{ log.sd_card.label }}</td>
+                <td>{{ log.user.name }}</td>
+                <td>
+                  {% if log.event %}{{ log.event.name }}{% endif %}
+                  {% if log.session %}<br><small>{{ log.session.label }}</small>{% endif %}
+                </td>
+                <td>{{ log.purpose }}</td>
+                <td>{{ log.checked_out_at }}</td>
+                <td>
+                  <form method="post" class="d-inline">
+                    <input type="hidden" name="action" value="return">
+                    <input type="hidden" name="log_id" value="{{ log.id }}">
+                    <button class="btn btn-success btn-sm">Return</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="mb-0">No cards are currently checked out.</p>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card mt-3">
+  <div class="card-body">
+    <h5 class="card-title">All SD cards</h5>
+    <div class="table-responsive">
+      <table class="table table-sm">
+        <thead>
+        <tr>
+          <th>Label</th>
+          <th>Capacity</th>
+          <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for c in sd_cards %}
+          <tr>
+            <td>{{ c.label }}</td>
+            <td>{{ c.capacity_gb or "-" }} GB</td>
+            <td>{{ c.status }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

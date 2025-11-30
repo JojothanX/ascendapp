@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Session athletes{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">Shoot list - {{ session.label }} ({{ session.date }})</h1>
+
+<div class="card">
+  <div class="card-body">
+    {% if athlete_sessions %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead>
+            <tr>
+              <th>Athlete</th>
+              <th>Team</th>
+              <th>Package</th>
+              <th>Paid</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for a in athlete_sessions %}
+            <tr>
+              <td>{{ a.athlete.name }}</td>
+              <td>{{ a.athlete.team or "" }}</td>
+              <td>{{ a.package.name }}</td>
+              <td>{{ "Yes" if a.paid else "No" }}</td>
+              <td>{{ a.notes or "" }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="mb-0">No athletes in this session.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

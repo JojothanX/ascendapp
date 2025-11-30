@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}Events & sessions{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">Events and sessions</h1>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <h5 class="card-title">Create event</h5>
+    <form method="post" class="row g-2">
+      <input type="hidden" name="action" value="add_event">
+      <div class="col-12 col-md-4">
+        <label class="form-label">Name</label>
+        <input type="text" class="form-control" name="name" placeholder="ARK Open 2025" required>
+      </div>
+      <div class="col-6 col-md-2">
+        <label class="form-label">Start date</label>
+        <input type="date" class="form-control" name="date_start" required>
+      </div>
+      <div class="col-6 col-md-2">
+        <label class="form-label">End date</label>
+        <input type="date" class="form-control" name="date_end" required>
+      </div>
+      <div class="col-12 col-md-4">
+        <label class="form-label">Location</label>
+        <input type="text" class="form-control" name="location" placeholder="Ark Bloc, Singapore">
+      </div>
+      <div class="col-12 mt-2">
+        <button class="btn btn-primary btn-sm">Create event</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title">Existing events</h5>
+    {% if events %}
+      {% for e in events %}
+        <div class="border rounded p-2 mb-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <strong>{{ e.name }}</strong><br>
+              <small class="text-muted">
+                {{ e.date_start }} to {{ e.date_end }}
+                {% if e.location %} • {{ e.location }}{% endif %}
+              </small>
+            </div>
+          </div>
+
+          <hr class="my-2">
+
+          <div class="row">
+            <div class="col-12 col-md-7">
+              <h6>Sessions</h6>
+              {% if e.sessions %}
+                <div class="table-responsive">
+                  <table class="table table-sm mb-2">
+                    <thead>
+                      <tr>
+                        <th>Label</th>
+                        <th>Date</th>
+                        <th>Time block</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    {% for s in e.sessions %}
+                      <tr>
+                        <td>{{ s.label }}</td>
+                        <td>{{ s.date }}</td>
+                        <td>{{ s.time_block or "" }}</td>
+                      </tr>
+                    {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              {% else %}
+                <p class="mb-2">No sessions yet.</p>
+              {% endif %}
+            </div>
+            <div class="col-12 col-md-5">
+              <h6>Add session</h6>
+              <form method="post" class="row g-2">
+                <input type="hidden" name="action" value="add_session">
+                <input type="hidden" name="event_id" value="{{ e.id }}">
+                <div class="col-12">
+                  <label class="form-label">Label</label>
+                  <input type="text" class="form-control form-control-sm" name="label" placeholder="Day 1 AM" required>
+                </div>
+                <div class="col-6">
+                  <label class="form-label">Date</label>
+                  <input type="date" class="form-control form-control-sm" name="date" required>
+                </div>
+                <div class="col-6">
+                  <label class="form-label">Time block</label>
+                  <select class="form-select form-select-sm" name="time_block">
+                    <option value="">None</option>
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <button class="btn btn-secondary btn-sm w-100 mt-1">Add session</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="mb-0">No events created yet.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

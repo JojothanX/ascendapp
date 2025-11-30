@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Packages{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">Packages</h1>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <h5 class="card-title">Create package</h5>
+    <form method="post" class="row g-2">
+      <div class="col-12 col-md-4">
+        <label class="form-label">Name</label>
+        <input type="text" class="form-control" name="name" placeholder="Spotlight" required>
+      </div>
+      <div class="col-12 col-md-8">
+        <label class="form-label">Description</label>
+        <input type="text" class="form-control" name="description" placeholder="Photos + highlight edit">
+      </div>
+      <div class="col-12 mt-2">
+        <button class="btn btn-primary btn-sm">Create package</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title">Existing packages</h5>
+    {% if packages %}
+      <div class="table-responsive">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in packages %}
+              <tr>
+                <td>{{ p.name }}</td>
+                <td>{{ p.description or "" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="mb-0">No packages yet.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

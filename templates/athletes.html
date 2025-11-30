@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block title %}Athletes{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">Athletes and packages</h1>
+
+{% if current_user.role == "founder" %}
+<div class="card mb-3">
+  <div class="card-body">
+    <h5 class="card-title">Add athlete session</h5>
+    <form method="post">
+      <input type="hidden" name="action" value="add_athlete_session">
+      <div class="row g-2">
+        <div class="col-12 col-md-4">
+          <label class="form-label">Athlete name</label>
+          <input type="text" class="form-control" name="athlete_name" required>
+        </div>
+        <div class="col-6 col-md-4">
+          <label class="form-label">Team</label>
+          <input type="text" class="form-control" name="team">
+        </div>
+        <div class="col-6 col-md-4">
+          <label class="form-label">Weight class</label>
+          <input type="text" class="form-control" name="weight_class">
+        </div>
+      </div>
+
+      <div class="row g-2 mt-2">
+        <div class="col-6 col-md-4">
+          <label class="form-label">Session</label>
+          <select class="form-select" name="session_id" required>
+            <option value="">Select</option>
+            {% for s in sessions %}
+              <option value="{{ s.id }}">{{ s.label }} ({{ s.date }})</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-6 col-md-4">
+          <label class="form-label">Package</label>
+          <select class="form-select" name="package_id" required>
+            <option value="">Select</option>
+            {% for p in packages %}
+              <option value="{{ p.id }}">{{ p.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-12 col-md-4">
+          <label class="form-label">Paid</label><br>
+          <input type="checkbox" name="paid" value="1"> Yes
+        </div>
+      </div>
+
+      <div class="row g-2 mt-2">
+        <div class="col-12">
+          <label class="form-label">Music link</label>
+          <input type="text" class="form-control" name="music_link" placeholder="Spotify, YouTube etc">
+        </div>
+        <div class="col-6">
+          <label class="form-label">Music start (00:00)</label>
+          <input type="text" class="form-control" name="music_start">
+        </div>
+        <div class="col-6">
+          <label class="form-label">Music end (01:00)</label>
+          <input type="text" class="form-control" name="music_end">
+        </div>
+      </div>
+
+      <div class="mt-2">
+        <label class="form-label">Notes</label>
+        <input type="text" class="form-control" name="notes">
+      </div>
+
+      <button class="btn btn-primary btn-sm mt-2">Save</button>
+    </form>
+  </div>
+</div>
+{% endif %}
+
+<div class="card mb-3">
+  <div class="card-body">
+    <form method="get" class="row g-2">
+      <div class="col-6 col-md-3">
+        <label class="form-label">Event</label>
+        <select class="form-select" name="event_id">
+          <option value="">All</option>
+          {% for e in events %}
+            <option value="{{ e.id }}" {% if selected_event_id == e.id %}selected{% endif %}>{{ e.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-md-3">
+        <label class="form-label">Session</label>
+        <select class="form-select" name="session_id">
+          <option value="">All</option>
+          {% for s in sessions %}
+            <option value="{{ s.id }}" {% if selected_session_id == s.id %}selected{% endif %}>
+              {{ s.label }} ({{ s.date }})
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 col-md-3 d-flex align-items-end">
+        <button class="btn btn-outline-primary w-100">Filter</button>
+      </div>
+      <div class="col-12 col-md-3 d-flex align-items-end">
+        {% if selected_session_id %}
+          <a class="btn btn-secondary w-100" href="{{ url_for('session_athletes_view', session_id=selected_session_id) }}">
+            Session shoot list
+          </a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title">Athlete sessions</h5>
+    {% if athlete_sessions %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead>
+            <tr>
+              <th>Athlete</th>
+              <th>Session</th>
+              <th>Package</th>
+              <th>Paid</th>
+              <th>Music</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in athlete_sessions %}
+              <tr>
+                <td>
+                  {{ a.athlete.name }}<br>
+                  <small class="text-muted">
+                    {{ a.athlete.team or "" }} {{ a.athlete.weight_class or "" }}
+                  </small>
+                </td>
+                <td>{{ a.session.label }}<br><small class="text-muted">{{ a.session.date }}</small></td>
+                <td>{{ a.package.name }}</td>
+                <td>{{ "Yes" if a.paid else "No" }}</td>
+                <td>
+                  {% if a.music_link %}
+                    <a href="{{ a.music_link }}" target="_blank">Link</a><br>
+                    <small>{{ a.music_start }} to {{ a.music_end }}</small>
+                  {% else %}
+                    -
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="mb-0">No athlete sessions found for this filter.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

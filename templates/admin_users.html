@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Users{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">Users</h1>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <h5 class="card-title">Add user</h5>
+    <form method="post" class="row g-2">
+      <input type="hidden" name="action" value="add_user">
+      <div class="col-12 col-md-3">
+        <label class="form-label">Name</label>
+        <input type="text" class="form-control" name="name" required>
+      </div>
+      <div class="col-12 col-md-3">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-control" name="email" required>
+      </div>
+      <div class="col-12 col-md-3">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-control" name="password" required>
+      </div>
+      <div class="col-6 col-md-2">
+        <label class="form-label">Role</label>
+        <select class="form-select" name="role">
+          <option value="freelancer">Freelancer</option>
+          <option value="founder">Founder</option>
+        </select>
+      </div>
+      <div class="col-6 col-md-1 d-flex align-items-end">
+        <div>
+          <label class="form-label d-block">Active</label>
+          <input type="checkbox" name="active" value="1" checked>
+        </div>
+      </div>
+      <div class="col-12 mt-2">
+        <button class="btn btn-primary btn-sm">Create user</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title">Existing users</h5>
+    {% if users %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Active</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for u in users %}
+            <tr>
+              <td>{{ u.name }}</td>
+              <td>{{ u.email }}</td>
+              <td>{{ u.role }}</td>
+              <td>{{ "Yes" if u.active else "No" }}</td>
+              <td>
+                <div class="d-flex gap-1">
+                  <form method="post">
+                    <input type="hidden" name="action" value="toggle_active">
+                    <input type="hidden" name="user_id" value="{{ u.id }}">
+                    <button class="btn btn-sm {% if u.active %}btn-outline-secondary{% else %}btn-outline-success{% endif %}">
+                      {% if u.active %}Deactivate{% else %}Activate{% endif %}
+                    </button>
+                  </form>
+                  <form method="post">
+                    <input type="hidden" name="action" value="change_role">
+                    <input type="hidden" name="user_id" value="{{ u.id }}">
+                    <select class="form-select form-select-sm d-inline-block w-auto" name="role" onchange="this.form.submit()">
+                      <option value="freelancer" {% if u.role == "freelancer" %}selected{% endif %}>Freelancer</option>
+                      <option value="founder" {% if u.role == "founder" %}selected{% endif %}>Founder</option>
+                    </select>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="mb-0">No users yet.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

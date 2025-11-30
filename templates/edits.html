@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block title %}Edits{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">Edit tracking</h1>
+
+{% if current_user.role == "founder" %}
+<div class="card mb-3">
+  <div class="card-body">
+    <h5 class="card-title">Create edit task</h5>
+    <form method="post" class="row g-2">
+      <input type="hidden" name="action" value="add_task">
+      <div class="col-12 col-md-4">
+        <label class="form-label">Athlete session</label>
+        <select class="form-select" name="athlete_session_id" required>
+          <option value="">Select</option>
+          {% for asess in athlete_sessions %}
+            <option value="{{ asess.id }}">
+              {{ asess.athlete.name }} - {{ asess.session.label }} ({{ asess.session.date }}) - {{ asess.package.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 col-md-4">
+        <label class="form-label">Assign to</label>
+        <select class="form-select" name="assigned_to_user_id" required>
+          <option value="">Select</option>
+          {% for u in users %}
+            <option value="{{ u.id }}">{{ u.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 col-md-4">
+        <label class="form-label">Type</label>
+        <select class="form-select" name="type" required>
+          <option value="photos">Photos</option>
+          <option value="highlight">Highlight edit</option>
+          <option value="static_video">Static video</option>
+        </select>
+      </div>
+      <div class="col-12 mt-2">
+        <button class="btn btn-primary btn-sm">Create task</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endif %}
+
+<div class="card mb-3">
+  <div class="card-body">
+    <form method="get" class="row g-2">
+      <div class="col-12 col-md-3">
+        <label class="form-label">Event</label>
+        <select class="form-select" name="event_id">
+          <option value="">All</option>
+          {% for e in events %}
+            <option value="{{ e.id }}" {% if selected_event_id == e.id %}selected{% endif %}>{{ e.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 col-md-3">
+        <label class="form-label">Session</label>
+        <select class="form-select" name="session_id">
+          <option value="">All</option>
+          {% for s in sessions %}
+            <option value="{{ s.id }}" {% if selected_session_id == s.id %}selected{% endif %}>{{ s.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 col-md-3">
+        <label class="form-label">Editor</label>
+        <select class="form-select" name="editor_id">
+          <option value="">All</option>
+          {% for u in users %}
+            <option value="{{ u.id }}" {% if selected_editor_id == u.id %}selected{% endif %}>{{ u.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 col-md-3">
+        <label class="form-label">Status</label>
+        <select class="form-select" name="status">
+          <option value="">All</option>
+          {% for s in ["not_started", "in_progress", "waiting_for_review", "sent_to_client"] %}
+            <option value="{{ s }}" {% if selected_status == s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 mt-2">
+        <button class="btn btn-outline-primary btn-sm">Filter</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title">Tasks</h5>
+    {% if tasks %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead>
+            <tr>
+              <th>Athlete</th>
+              <th>Session</th>
+              <th>Type</th>
+              <th>Editor</th>
+              <th>Status</th>
+              <th>Deliverable</th>
+              <th>Updated</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for t in tasks %}
+            <tr>
+              <td>{{ t.athlete_session.athlete.name }}</td>
+              <td>{{ t.athlete_session.session.label }}</td>
+              <td>{{ t.type }}</td>
+              <td>{{ t.assigned_to.name }}</td>
+              <td>{{ t.status }}</td>
+              <td>
+                {% if t.deliverable_link %}
+                  <a href="{{ t.deliverable_link }}" target="_blank">Link</a>
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>{{ t.updated_at }}</td>
+              <td>
+                <form method="post" class="row g-1">
+                  <input type="hidden" name="action" value="update_status">
+                  <input type="hidden" name="task_id" value="{{ t.id }}">
+                  <div class="col-12">
+                    <select class="form-select form-select-sm" name="status">
+                      {% for s in ["not_started", "in_progress", "waiting_for_review", "sent_to_client"] %}
+                        <option value="{{ s }}" {% if t.status == s %}selected{% endif %}>{{ s }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="col-12 mt-1">
+                    <input type="text" class="form-control form-control-sm" name="deliverable_link" placeholder="Drive link" value="{{ t.deliverable_link or "" }}">
+                  </div>
+                  <div class="col-12 mt-1">
+                    <button class="btn btn-primary btn-sm w-100">Update</button>
+                  </div>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="mb-0">No tasks found for this filter.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

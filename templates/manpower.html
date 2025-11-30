@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Manpower{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">Manpower allocation</h1>
+
+{% if current_user.role == "founder" %}
+<div class="card mb-3">
+  <div class="card-body">
+    <h5 class="card-title">Assign manpower</h5>
+    <form method="post" class="row g-2">
+      <div class="col-12 col-md-3">
+        <label class="form-label">Event</label>
+        <select class="form-select" name="event_id" required>
+          <option value="">Select</option>
+          {% for e in events %}
+            <option value="{{ e.id }}">{{ e.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 col-md-3">
+        <label class="form-label">Session</label>
+        <select class="form-select" name="session_id" required>
+          <option value="">Select</option>
+          {% for s in sessions %}
+            <option value="{{ s.id }}">{{ s.label }} ({{ s.date }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 col-md-3">
+        <label class="form-label">User</label>
+        <select class="form-select" name="user_id" required>
+          <option value="">Select</option>
+          {% for u in users %}
+            <option value="{{ u.id }}">{{ u.name }} ({{ u.role }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 col-md-3">
+        <label class="form-label">Role</label>
+        <input type="text" class="form-control" name="role" placeholder="Platform 1 photos">
+      </div>
+      <div class="col-12 mt-2">
+        <label class="form-label">Notes</label>
+        <input type="text" class="form-control" name="notes">
+      </div>
+      <div class="col-12 mt-2">
+        <button class="btn btn-primary btn-sm">Assign</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endif %}
+
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title">Allocations</h5>
+    {% if allocations %}
+      <div class="table-responsive">
+        <table class="table table-sm">
+          <thead>
+          <tr>
+            <th>Event</th>
+            <th>Session</th>
+            <th>User</th>
+            <th>Role</th>
+            <th>Notes</th>
+          </tr>
+          </thead>
+          <tbody>
+          {% for a in allocations %}
+            <tr>
+              <td>{{ a.event.name }}</td>
+              <td>{{ a.session.label }}<br><small class="text-muted">{{ a.session.date }}</small></td>
+              <td>{{ a.user.name }}</td>
+              <td>{{ a.role }}</td>
+              <td>{{ a.notes }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="mb-0">No manpower allocations yet.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
